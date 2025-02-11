@@ -6,10 +6,18 @@ public class PlayerController : MonoBehaviour
     [Header("Player Stats")]
     [Tooltip("Movement speed of the player in meters per second.")]
     [SerializeField] float speed;
+
     [Tooltip("Camera look sensitivity.")]
     [SerializeField] float sensitivity;
+
     [Tooltip("Player sprint speed in meters per second.")]
     [SerializeField] float sprintSpeed;
+
+    [Tooltip("Jump force of the player.")]
+    [SerializeField] float jumpForce;
+
+    [Tooltip("Gravity force applied to the player.")]
+    [SerializeField] float gravity;
 
     // Used to store the forward and backward movement input.
     private float moveFB;
@@ -19,12 +27,16 @@ public class PlayerController : MonoBehaviour
     private float rotX;
     // Used to store the mouse up and down input.
     private float rotY;
+    // Used to store the Y velocity of the player.
+    private Vector3 velY = Vector3.zero;
 
     // References
     // Reference to the player's vision camera.
     private Camera playerCam;
     // Reference to the CharacterController component on the Player.
     private CharacterController cc;
+
+
 
     void Start()
     {
@@ -62,22 +74,32 @@ public class PlayerController : MonoBehaviour
             movementSpeed = speed;
         }
 
+        // Use the CharacterController component to move the Player up by the jumpForce value when the Space key is pressed.
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            cc.Move(Vector3.up * jumpForce);
+        }
 
+
+        #region Movement Input Description
         // Get the forward/backward movement input for direction, and apply the speed.
-        moveFB = Input.GetAxis("Vertical") * movementSpeed;
         // Get the right/left movement input for direction, and apply the speed.
-        moveLR = Input.GetAxis("Horizontal") * movementSpeed;
         // Get the right/left mouse movement for direction, and apply the sensitivity.
-        rotX = Input.GetAxis("Mouse X") * sensitivity;
         // Get the up/down mouse movement for direction, apply the sensitivity, and subtract it from the previous rotY value.
+        #endregion
+        moveFB = Input.GetAxis("Vertical") * movementSpeed;
+        moveLR = Input.GetAxis("Horizontal") * movementSpeed;
+        rotX = Input.GetAxis("Mouse X") * sensitivity;
         rotY -= Input.GetAxis("Mouse Y") * sensitivity;
 
         // Clamp the value of rotY between -60 degrees and +60 degrees.
         rotY = Mathf.Clamp(rotY, -60f, 60f);
 
+        #region Movement Normalization Description
         // Calculate the movement vector for the player by applying forward/backward movement and right/left movement.
         // Notice we normalize the vector making it have a magnitude of 1. This essentially makes it a direction only vector, with no distance (speed).
         // Finally, we multiply by the movementSpeed to get our distance.
+        #endregion
         Vector3 movement = new Vector3(moveLR, 0, moveFB).normalized * movementSpeed;
 
         // Use the right/left mouse movement to rotate the Player's body left and right (around the Y axis).
@@ -88,8 +110,23 @@ public class PlayerController : MonoBehaviour
 
         // Update our movement vector to take into account the current Player's rotation, and combine that with the current movement vector.
         movement = transform.rotation * movement;
-        // Call the Move() method on the CharacterController component and pass in our movement vector, not forgetting to multiple by Time.deltaTime.
-        // Remember multiplying by Time.deltaTime is necessary to keep framerate independent movement speeds.
+
+        // Gravity logic
+        // cc.isGrounded is a built-in method that checks if the CharacterController is touching the ground.
+        if (cc.isGrounded && Input.GetKeyDown(KeyCode.Space))
+        {
+            movement.y = jumpForce;
+        }
+
+        if (cc.isGrounded && velY.y < 0)
+        {
+            movement.y = -2f;
+        }else
+        {
+            movement.y -= gravity; // Apply gravity over time
+        }
+
+        // Apply movement and gravity
         cc.Move(movement * Time.deltaTime);
     }
 }
