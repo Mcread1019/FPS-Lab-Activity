@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float sensitivity;
     [Tooltip("Player sprint speed in meters per second.")]
     [SerializeField] float sprintSpeed;
+
+    [SerializeField] float jumpForce;
+    [SerializeField] float gravity = 9.81f;
+
 
     // Used to store the forward and backward movement input.
     private float moveFB;
@@ -79,6 +84,20 @@ public class PlayerController : MonoBehaviour
         // Notice we normalize the vector making it have a magnitude of 1. This essentially makes it a direction only vector, with no distance (speed).
         // Finally, we multiply by the movementSpeed to get our distance.
         Vector3 movement = new Vector3(moveLR, 0, moveFB).normalized * movementSpeed;
+
+        if (Input.GetKeyDown(KeyCode.Space) && cc.isGrounded)
+        {
+            cc.Move(Vector3.up * jumpForce);
+        }
+
+        if (cc.isGrounded)
+        {
+            movement.y = -2f;
+        }
+        else
+        {
+            movement.y -= gravity;
+        }
 
         // Use the right/left mouse movement to rotate the Player's body left and right (around the Y axis).
         transform.Rotate(0, rotX, 0);
