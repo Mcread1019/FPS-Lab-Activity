@@ -116,6 +116,8 @@ public class PlayerController : MonoBehaviour
         // Update our movement vector to take into account the current Player's rotation, and combine that with the current movement vector.
         movement = transform.rotation * movement;
 
+
+        //---------- Changed -----------------
         // Gravity and Jumping
         if (cc.isGrounded)
         {
