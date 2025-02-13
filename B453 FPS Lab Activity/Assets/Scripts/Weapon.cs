@@ -13,6 +13,11 @@ public abstract class Weapon : MonoBehaviour
     // How many bullets this weapon can hold.
     [SerializeField] protected float bulletCount;
 
+    protected virtual void Start()
+    {
+        // Code to initialize the weapon.
+    }
+
     protected virtual void Shoot()
     {
         // Code to shoot the weapon.

@@ -1,4 +1,11 @@
+using System.Net.NetworkInformation;
+using Unity.Burst.Intrinsics;
+using Unity.VisualScripting;
 using UnityEngine;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using static UnityEditor.Searcher.SearcherWindow.Alignment;
+using static UnityEngine.Rendering.DebugUI.Table;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class PlayerController : MonoBehaviour
 {
@@ -28,7 +35,7 @@ public class PlayerController : MonoBehaviour
     // Used to store the mouse up and down input.
     private float rotY;
     // Used to store the Y velocity of the player.
-    private Vector3 velY = Vector3.zero;
+    private Vector3 jumpVelocity = Vector3.zero;
 
     // References
     // Reference to the player's vision camera.
@@ -45,8 +52,12 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         // Get the reference to the CharacterController component on the Player.
         cc = GetComponent<CharacterController>();
+
         // Access the first child of the Player and get the Camera component from it.
-        playerCam = transform.GetChild(0).GetComponent<Camera>();
+        //playerCam = transform.GetChild(0).GetComponent<Camera>(); 
+
+        //Find the child object named "Camera" and get its Camera component.
+        playerCam = transform.Find("Camera").GetComponent<Camera>();
     }
 
     void Update()
@@ -72,12 +83,6 @@ public class PlayerController : MonoBehaviour
         {
             // The player is NOT sprinting, so change the movementSpeed variable to the normal speed.
             movementSpeed = speed;
-        }
-
-        // Use the CharacterController component to move the Player up by the jumpForce value when the Space key is pressed.
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            cc.Move(Vector3.up * jumpForce);
         }
 
 
@@ -111,22 +116,44 @@ public class PlayerController : MonoBehaviour
         // Update our movement vector to take into account the current Player's rotation, and combine that with the current movement vector.
         movement = transform.rotation * movement;
 
-        // Gravity logic
-        // cc.isGrounded is a built-in method that checks if the CharacterController is touching the ground.
-        if (cc.isGrounded && Input.GetKeyDown(KeyCode.Space))
+        // Gravity and Jumping
+        if (cc.isGrounded)
         {
-            movement.y = jumpForce;
+            if (jumpVelocity.y < 0)
+            {
+                jumpVelocity.y = -2f; // Ensures player stays on ground
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space)) // Jumping
+            {
+                Debug.Log("Jump");
+                jumpVelocity.y = jumpForce;
+            }
         }
 
-        if (cc.isGrounded && velY.y < 0)
+        // Apply gravity
+        if (!cc.isGrounded)
         {
-            movement.y = -2f;
-        }else
-        {
-            movement.y -= gravity; // Apply gravity over time
+            jumpVelocity.y -= gravity * Time.deltaTime;
         }
 
         // Apply movement and gravity
-        cc.Move(movement * Time.deltaTime);
+        cc.Move((movement + jumpVelocity) * Time.deltaTime);
+
+        #region JumpingVeclocity Explanation
+        /**
+        The movement calculation should only modify horizontal movement.
+        Vertical movement should be handled separately using as seperate Vector3 velocity.y.
+
+        When you modify movement.y for jumping, you run into the issue of overwrite it when handling gravity.
+        You need a persistent variable(e.g., velocity.y) to track vertical movement over multiple frames.
+        Gravity is applied incorrectly
+
+        Right now, gravity and movement are stored in movement.y, but movement is recalculated every frame.
+        When jumping, movement.y = jumpForce; only lasts for one frame and is reset immediately.
+        Incorrect movement application order
+
+        **/
+        #endregion
     }
 }
