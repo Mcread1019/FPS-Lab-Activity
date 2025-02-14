@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Player sprint speed in meters per second.")]
     [SerializeField] float sprintSpeed;
 
+    [SerializeField] int spareRounds;
+
     [SerializeField] float jumpForce;
     [SerializeField] float gravity = 9.81f;
 

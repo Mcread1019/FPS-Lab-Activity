@@ -6,7 +6,8 @@ public abstract class Weapon : MonoBehaviour
     [SerializeField] protected float damage;
     [SerializeField] protected float range;
     [SerializeField] protected float firerate;
-    [SerializeField] protected float bulletCount;
+    [SerializeField] protected int bulletCount;
+    [SerializeField] protected int maxCapacity;
 
     protected virtual void Shoot() { }
     protected virtual void Reload() { }
