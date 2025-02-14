@@ -2,10 +2,7 @@ using System.Net.NetworkInformation;
 using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
-using static UnityEditor.Searcher.SearcherWindow.Alignment;
-using static UnityEngine.Rendering.DebugUI.Table;
-using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,11 +17,11 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Player sprint speed in meters per second.")]
     [SerializeField] float sprintSpeed;
 
-    [Tooltip("Jump force of the player.")]
-    [SerializeField] float jumpForce;
+    [SerializeField] int spareRounds;
 
-    [Tooltip("Gravity force applied to the player.")]
-    [SerializeField] float gravity;
+    [SerializeField] float jumpForce;
+    [SerializeField] float gravity = 9.81f;
+
 
     // Used to store the forward and backward movement input.
     private float moveFB;
@@ -106,6 +103,20 @@ public class PlayerController : MonoBehaviour
         // Finally, we multiply by the movementSpeed to get our distance.
         #endregion
         Vector3 movement = new Vector3(moveLR, 0, moveFB).normalized * movementSpeed;
+
+        if (Input.GetKeyDown(KeyCode.Space) && cc.isGrounded)
+        {
+            cc.Move(Vector3.up * jumpForce);
+        }
+
+        if (cc.isGrounded)
+        {
+            movement.y = -2f;
+        }
+        else
+        {
+            movement.y -= gravity;
+        }
 
         // Use the right/left mouse movement to rotate the Player's body left and right (around the Y axis).
         transform.Rotate(0, rotX, 0);

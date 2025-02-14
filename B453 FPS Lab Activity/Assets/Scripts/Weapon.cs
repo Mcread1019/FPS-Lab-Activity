@@ -10,17 +10,9 @@ public abstract class Weapon : MonoBehaviour
 
     // The range of this weapon.
     [SerializeField] protected float range;
-
-    // How quickly this weapon can fire.
-    [SerializeField] protected float fireRate;
-
-    // How many bullets this weapon can hold.
-    [SerializeField] protected float bulletCount;
-
-    protected virtual void Start()
-    {
-        // Code to initialize the weapon.
-    }
+    [SerializeField] protected float firerate;
+    [SerializeField] protected int bulletCount;
+    [SerializeField] protected int maxCapacity;
 
     protected virtual void Shoot()
     {

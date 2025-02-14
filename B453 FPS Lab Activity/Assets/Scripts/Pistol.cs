@@ -1,4 +1,5 @@
 using UnityEngine;
+
 public class Pistol : Weapon
 {
     private void Update()
@@ -8,13 +9,14 @@ public class Pistol : Weapon
             Shoot();
         }
     }
-    protected override void Shoot()
-    {
+
+    protected override void Shoot() { 
         RaycastHit hit;
         Debug.DrawRay(firePoint.position, firePoint.forward * range, Color.red, 1f);
-        if (Physics.Raycast(firePoint.position, firePoint.forward, out hit, range))
+        if(Physics.Raycast(firePoint.position, firePoint.forward, out hit, range))
         {
             Debug.Log(hit.transform.name);
         }
     }
+    protected override void Reload() { }
 }
