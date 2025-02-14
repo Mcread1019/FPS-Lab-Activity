@@ -118,6 +118,7 @@ public class PlayerController : MonoBehaviour
             movement.y -= gravity;
         }
 
+
         // Use the right/left mouse movement to rotate the Player's body left and right (around the Y axis).
         transform.Rotate(0, rotX, 0);
 
@@ -127,31 +128,32 @@ public class PlayerController : MonoBehaviour
         // Update our movement vector to take into account the current Player's rotation, and combine that with the current movement vector.
         movement = transform.rotation * movement;
 
+        cc.Move(movement * Time.deltaTime);
 
         //---------- Changed -----------------
         // Gravity and Jumping
-        if (cc.isGrounded)
-        {
-            if (jumpVelocity.y < 0)
-            {
-                jumpVelocity.y = -2f; // Ensures player stays on ground
-            }
+        //if (cc.isGrounded)
+        //{
+        //    if (jumpVelocity.y < 0)
+        //    {
+        //        jumpVelocity.y = -2f; // Ensures player stays on ground
+        //    }
 
-            if (Input.GetKeyDown(KeyCode.Space)) // Jumping
-            {
-                Debug.Log("Jump");
-                jumpVelocity.y = jumpForce;
-            }
-        }
+        //    if (Input.GetKeyDown(KeyCode.Space)) // Jumping
+        //    {
+        //        Debug.Log("Jump");
+        //        jumpVelocity.y = jumpForce;
+        //    }
+        //}
 
-        // Apply gravity
-        if (!cc.isGrounded)
-        {
-            jumpVelocity.y -= gravity * Time.deltaTime;
-        }
+        //// Apply gravity
+        //if (!cc.isGrounded)
+        //{
+        //    jumpVelocity.y -= gravity * Time.deltaTime;
+        //}
 
-        // Apply movement and gravity
-        cc.Move((movement + jumpVelocity) * Time.deltaTime);
+        //// Apply movement and gravity
+        //cc.Move((movement + jumpVelocity) * Time.deltaTime);
 
         #region JumpingVeclocity Explanation
         /**
