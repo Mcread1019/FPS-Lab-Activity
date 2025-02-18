@@ -6,6 +6,7 @@ using UnityEngine;
 public abstract class Weapon : MonoBehaviour
 {
     // The location in space where the projectiles (or raycast) will be spawned.
+    [Header("Weapon Settings")]
     [SerializeField] protected Transform firePoint;
 
     // How much damage this weapon does.
@@ -16,6 +17,14 @@ public abstract class Weapon : MonoBehaviour
     [SerializeField] protected float firerate;
     [SerializeField] protected int bulletCount;
     [SerializeField] protected int maxCapacity;     //TODO Rename to magCapacity to bulletCapacity
+
+    [Space]
+    [Header("Effects")]
+    [SerializeField] protected ParticleSystem muzzleFlash;
+    [SerializeField] protected Light muzzleLight;
+    [SerializeField] protected GameObject bulletDecals;
+    [HideInInspector]
+    [SerializeField] protected Transform decalManager;
 
     //ADDED Fields --> later to become a magazine class
     [SerializeField] private PlayerController playerController;
@@ -38,6 +47,13 @@ public abstract class Weapon : MonoBehaviour
         {
             // Attempt to find the FirePoint and PlayerController
             firePoint = transform.Find("FirePoint");
+
+            //Find the neccessary Muzzle flash components
+            muzzleFlash = transform.Find("MuzzleFlash").GetComponent<ParticleSystem>();
+            muzzleLight = transform.Find("MuzzleFlash").Find("Light").GetComponent<Light>();
+
+            decalManager = GameObject.Find("DecalManager").transform;
+
             playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         }
         catch (NullReferenceException e)
@@ -50,6 +66,9 @@ public abstract class Weapon : MonoBehaviour
     //Changed to public virtual void Shoot() to allow for overriding
     public virtual void Shoot()
     {
+        muzzleFlash.Play();
+        StartCoroutine(LightCourotine());
+
         if (bulletCount <= 0 && !isReloading)
         {
             isReloading = true;
@@ -122,5 +141,12 @@ public abstract class Weapon : MonoBehaviour
         }
 
         isReloading = false;
+    }
+
+    protected virtual IEnumerator LightCourotine()
+    {
+        muzzleLight.enabled = true;
+        yield return new WaitForSeconds(0.1f);
+        muzzleLight.enabled = false;
     }
 }
