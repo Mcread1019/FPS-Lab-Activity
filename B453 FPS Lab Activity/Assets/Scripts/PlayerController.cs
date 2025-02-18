@@ -17,10 +17,26 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Player sprint speed in meters per second.")]
     [SerializeField] float sprintSpeed;
 
-    [SerializeField] int spareRounds;
-
     [SerializeField] float jumpForce;
     [SerializeField] float gravity = 9.81f;
+
+    [Space]
+    [Header("Weapon")]
+    [SerializeField] int spareRounds;
+    [SerializeField] Weapon currentWeapon;
+
+    /**
+     * Added a property to access the spareRounds field
+     * Helps debug and keep your code organized
+     * I like to keep fields private a5t the top of the class
+     * Then properties, then private variables
+    */
+
+    public int SpareRounds
+    {
+        get => spareRounds;
+        set => spareRounds = value;
+    }
 
 
     // Used to store the forward and backward movement input.
@@ -55,12 +71,24 @@ public class PlayerController : MonoBehaviour
 
         //Find the child object named "Camera" and get its Camera component.
         playerCam = transform.Find("Camera").GetComponent<Camera>();
+        currentWeapon = GetComponentInChildren<Weapon>();
     }
 
     void Update()
     {
         // Check every frame for movement input and apply the movement.
         Move();
+
+        //Handle weapon input
+        if (Input.GetButtonDown("Fire1"))
+        {
+            currentWeapon.Shoot();
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            currentWeapon.Reload(spareRounds);
+        }
     }
 
     // This method handles all player movement input and moves the Player accordingly.
